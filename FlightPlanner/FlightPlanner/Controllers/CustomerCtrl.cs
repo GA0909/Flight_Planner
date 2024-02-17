@@ -2,6 +2,7 @@
 using FlightPlanner.storage;
 using Microsoft.AspNetCore.Mvc;
 
+
 namespace FlightPlanner.Controllers
 {
     [Route("api")]
@@ -52,6 +53,32 @@ namespace FlightPlanner.Controllers
 
             // Return matched airports
             return Ok(matchedAirports);
+        }
+
+        [HttpPost]
+        [Route("flights/search")]
+        public IActionResult SearchFlights(SearchFlightsRequest req)
+        {
+            //search
+            if (req.DepartureDate == null || req.From == null || req.To == null || req.From == req.To)
+            {
+                return BadRequest();
+            }
+
+            var res = new PageResult();
+            return Ok(res);
+            //return page: totalItems: items:
+        }
+        [HttpGet]
+        [Route("flights/{id}")]
+        public IActionResult FindFlightById(int id)
+        {
+            var flight = FlightStorage.GetFlightById(id);
+            if (flight == null)
+            {
+                return NotFound();
+            }
+            return Ok(flight);
         }
 
 
