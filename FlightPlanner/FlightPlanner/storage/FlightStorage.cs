@@ -38,5 +38,10 @@ namespace FlightPlanner.storage
         {
             _flights.Clear();
         }
+        public static List<Flight> GetAllFlights()
+        {
+            // Return a copy of the flights list to avoid modifying the original list
+            return _flights.ToList();
+        }
     }
 }
