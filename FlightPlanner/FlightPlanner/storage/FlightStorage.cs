@@ -29,6 +29,11 @@ namespace FlightPlanner.storage
         {
           return  _flights.FirstOrDefault(flight => flight.Id == id);
         }
+
+        public static void DeleteFlightById(int id)
+        {
+            _flights.Remove(GetFlightById(id));
+        }
         public static void Clear()
         {
             _flights.Clear();
