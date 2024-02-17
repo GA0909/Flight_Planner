@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using FlightPlanner.storage;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FlightPlanner.Controllers
@@ -11,6 +12,7 @@ namespace FlightPlanner.Controllers
         [Route("clear")]
         public IActionResult Clear()
         {
+            FlightStorage.Clear();
             return Ok();
         }
     }
