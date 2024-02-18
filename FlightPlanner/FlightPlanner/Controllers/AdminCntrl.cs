@@ -59,27 +59,24 @@ namespace FlightPlanner.Controllers
                 return Conflict();
             }
 
-            // Normalize airport codes to lowercase for comparison
-            string fromAirportCode = flight.From.AirportCode?.Trim().ToLower();
-            string toAirportCode = flight.To.AirportCode?.Trim().ToLower();
+            string fromAirportCode = flight.From.AirportCode.Trim().ToLower();
+            string toAirportCode = flight.To.AirportCode.Trim().ToLower();
 
-            // Check if the departure and arrival airports are the same
+
             if (fromAirportCode == toAirportCode)
             {
-                return BadRequest("Departure and arrival airports cannot be the same.");
+                return BadRequest();
             }
 
-            //
             if (!DateTime.TryParseExact(flight.DepartureTime, "yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime departureDateTime) ||
                 !DateTime.TryParseExact(flight.ArrivalTime, "yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime arrivalDateTime))
             {
-                return BadRequest("Invalid date/time format. Use yyyy-MM-dd HH:mm format.");
+                return BadRequest();
             }
 
-            // Check if departure time is greater than or equal to arrival time
             if (departureDateTime >= arrivalDateTime)
             {
-                return BadRequest("Departure time must be earlier than arrival time.");
+                return BadRequest();
             }
 
             FlightStorage.AddFlight(flight);

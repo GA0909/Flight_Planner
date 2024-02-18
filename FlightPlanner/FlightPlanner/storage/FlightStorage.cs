@@ -9,22 +9,18 @@ namespace FlightPlanner.storage
 
         public static void AddFlight(Flight flight)
         {
-            
             flight.Id = _id++;
             _flights.Add(flight);
 
         }
-
         public static bool FlightExists(Flight flight)
         {
-            // Create a snapshot of the _flights collection
             Flight[] flightsSnapshot;
             lock (_flights)
             {
                 flightsSnapshot = _flights.ToArray();
             }
 
-            // Check if any flight matches the specified criteria
             return flightsSnapshot.Any(f =>
                 f.Carrier == flight.Carrier &&
                 f.From.AirportCode == flight.From.AirportCode &&
@@ -37,7 +33,7 @@ namespace FlightPlanner.storage
         {
             if (_flights == null)
             {
-                // Initialize the _flights collection if it's null
+
                 _flights = new List<Flight>();
             }
 
@@ -58,7 +54,6 @@ namespace FlightPlanner.storage
         }
         public static List<Flight> GetAllFlights()
         {
-            // Return a copy of the flights list to avoid modifying the original list
             return _flights.ToList();
         }
     }
