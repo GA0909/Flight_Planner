@@ -17,7 +17,15 @@ namespace FlightPlanner.storage
 
         public static bool FlightExists(Flight flight)
         {
-            return _flights.Any(f =>
+            // Create a snapshot of the _flights collection
+            Flight[] flightsSnapshot;
+            lock (_flights)
+            {
+                flightsSnapshot = _flights.ToArray();
+            }
+
+            // Check if any flight matches the specified criteria
+            return flightsSnapshot.Any(f =>
                 f.Carrier == flight.Carrier &&
                 f.From.AirportCode == flight.From.AirportCode &&
                 f.To.AirportCode == flight.To.AirportCode &&
@@ -27,12 +35,22 @@ namespace FlightPlanner.storage
 
         public static Flight? GetFlightById(int id)
         {
-          return  _flights.FirstOrDefault(flight => flight.Id == id);
+            if (_flights == null)
+            {
+                // Initialize the _flights collection if it's null
+                _flights = new List<Flight>();
+            }
+
+            return _flights.FirstOrDefault(f => f.Id == id);
         }
 
         public static void DeleteFlightById(int id)
         {
-            _flights.Remove(GetFlightById(id));
+            var flightToRemove = GetFlightById(id);
+            if (flightToRemove != null)
+            {
+                _flights.Remove(flightToRemove);
+            }
         }
         public static void Clear()
         {

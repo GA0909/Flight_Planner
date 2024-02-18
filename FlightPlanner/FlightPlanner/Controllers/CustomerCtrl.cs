@@ -1,4 +1,5 @@
-﻿using FlightPlanner.models;
+﻿using System.Globalization;
+using FlightPlanner.models;
 using FlightPlanner.storage;
 using Microsoft.AspNetCore.Mvc;
 
@@ -60,13 +61,32 @@ namespace FlightPlanner.Controllers
         public IActionResult SearchFlights(SearchFlightsRequest req)
         {
             //search
+            
             if (req.DepartureDate == null || req.From == null || req.To == null || req.From == req.To)
             {
                 return BadRequest();
             }
+            // Retrieve all flights from storage
+            // Retrieve all flights from storage
+            List<Flight> allFlights = FlightStorage.GetAllFlights();
 
-            var res = new PageResult();
-            return Ok(res);
+            // Filter flights based on criteria
+            List<Flight> matchingFlights = allFlights.Where(f =>
+                    f.From.AirportCode == req.From &&
+                    f.To.AirportCode == req.To &&
+                    f.DepartureTime.Substring(0,10) == req.DepartureDate)
+                .ToList();
+
+            // Create a PageResult containing the matching flights
+            PageResult result = new PageResult
+            {
+                Page = 1, // Assuming only one page
+                TotalItems = matchingFlights.Count,
+                Items = matchingFlights
+            };
+
+            return Ok(result);
+
             //return page: totalItems: items:
         }
         [HttpGet]
