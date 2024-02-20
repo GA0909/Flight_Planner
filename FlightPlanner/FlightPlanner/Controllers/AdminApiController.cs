@@ -79,6 +79,7 @@ namespace FlightPlanner.Controllers
                 return BadRequest();
             }
 
+            
             FlightStorage.AddFlight(flight);
             return Created("", flight);
         }

@@ -68,7 +68,7 @@ namespace FlightPlanner.Controllers
 
             PageResult result = new PageResult
             {
-                Page = 1, 
+                Page = 0, 
                 TotalItems = matchingFlights.Count,
                 Items = matchingFlights
             };
