@@ -20,18 +20,18 @@ namespace FlightPlanner.storage
 
         public static bool FlightExists(Flight flight)
         {
-            Flight[] flightsSnapshot;
-            lock (_flights)
-            {
-                flightsSnapshot = _flights.ToArray();
-            }
 
-            return flightsSnapshot.Any(f =>
-                f.Carrier == flight.Carrier &&
-                f.From.AirportCode == flight.From.AirportCode &&
-                f.To.AirportCode == flight.To.AirportCode &&
-                f.DepartureTime == flight.DepartureTime &&
-                f.ArrivalTime == flight.ArrivalTime); ;
+            lock (_lockObject)
+            {
+
+                return _flights.Any(f =>
+                    f.Carrier == flight.Carrier &&
+                    f.From.AirportCode == flight.From.AirportCode &&
+                    f.To.AirportCode == flight.To.AirportCode &&
+                    f.DepartureTime == flight.DepartureTime &&
+                    f.ArrivalTime == flight.ArrivalTime);
+                ;
+            }
         }
 
         public static Flight? GetFlightById(int id)
