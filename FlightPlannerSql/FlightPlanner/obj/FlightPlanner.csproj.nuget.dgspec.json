@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\gatis\\Desktop\\Flight_Planner\\FlightPlanner\\FlightPlanner\\FlightPlanner.csproj": {}
+    "C:\\Users\\gatis\\Desktop\\Flight_Planner\\FlightPlannerSql\\FlightPlanner\\FlightPlanner.csproj": {}
   },
   "projects": {
-    "C:\\Users\\gatis\\Desktop\\Flight_Planner\\FlightPlanner\\FlightPlanner\\FlightPlanner.csproj": {
+    "C:\\Users\\gatis\\Desktop\\Flight_Planner\\FlightPlannerSql\\FlightPlanner\\FlightPlanner.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\gatis\\Desktop\\Flight_Planner\\FlightPlanner\\FlightPlanner\\FlightPlanner.csproj",
+        "projectUniqueName": "C:\\Users\\gatis\\Desktop\\Flight_Planner\\FlightPlannerSql\\FlightPlanner\\FlightPlanner.csproj",
         "projectName": "FlightPlanner",
-        "projectPath": "C:\\Users\\gatis\\Desktop\\Flight_Planner\\FlightPlanner\\FlightPlanner\\FlightPlanner.csproj",
+        "projectPath": "C:\\Users\\gatis\\Desktop\\Flight_Planner\\FlightPlannerSql\\FlightPlanner\\FlightPlanner.csproj",
         "packagesPath": "C:\\Users\\gatis\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\gatis\\Desktop\\Flight_Planner\\FlightPlanner\\FlightPlanner\\obj\\",
+        "outputPath": "C:\\Users\\gatis\\Desktop\\Flight_Planner\\FlightPlannerSql\\FlightPlanner\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\gatis\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -40,6 +40,20 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "dependencies": {
+            "Microsoft.EntityFrameworkCore": {
+              "target": "Package",
+              "version": "[8.0.0, )"
+            },
+            "Microsoft.EntityFrameworkCore.SqlServer": {
+              "target": "Package",
+              "version": "[8.0.0, )"
+            },
+            "Microsoft.EntityFrameworkCore.Tools": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[8.0.0, )"
+            },
             "Swashbuckle.AspNetCore": {
               "target": "Package",
               "version": "[6.4.0, )"

@@ -5,6 +5,7 @@ using FlightPlanner.storage;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace FlightPlanner.Controllers
 {
@@ -13,11 +14,20 @@ namespace FlightPlanner.Controllers
     [ApiController]
     public class AdminCntrl : ControllerBase
     {
+        private readonly FlightPlannerDbContex _context;
+
+        public AdminCntrl(FlightPlannerDbContex context)
+        {
+            _context = context;
+        }
+
         [HttpGet]
         [Route("flights/{id}")]
         public IActionResult GetFlight(int id)
         {
-            var flight = FlightStorage.GetFlightById(id);
+            var flight = _context.Flights.Include(flight => flight.To)
+                .Include(flight => flight.From)
+                .SingleOrDefault(flight => flight.Id == id);
             if (flight == null)
             {
                 return NotFound();
@@ -54,7 +64,7 @@ namespace FlightPlanner.Controllers
                 return BadRequest();
             }
 
-            if (FlightStorage.FlightExists(flight))
+            if (SqlFlightExists(flight))
             {
                 return Conflict();
             }
@@ -79,9 +89,19 @@ namespace FlightPlanner.Controllers
                 return BadRequest();
             }
 
-            
-            FlightStorage.AddFlight(flight);
+            _context.Flights.Add(flight);
+            _context.SaveChanges();
             return Created("", flight);
+        }
+        public bool SqlFlightExists(Flight flight)
+        {
+            return _context.Flights.Include(f => f.To).Include(f => f.From).Any(f =>
+                f.Carrier == flight.Carrier &&
+                f.From.AirportCode == flight.From.AirportCode &&
+                f.To.AirportCode == flight.To.AirportCode &&
+                f.DepartureTime == flight.DepartureTime &&
+                f.ArrivalTime == flight.ArrivalTime);
+            
         }
 
 

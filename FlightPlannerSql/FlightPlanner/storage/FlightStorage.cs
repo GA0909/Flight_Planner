@@ -31,7 +31,7 @@ namespace FlightPlanner.storage
                 f.From.AirportCode == flight.From.AirportCode &&
                 f.To.AirportCode == flight.To.AirportCode &&
                 f.DepartureTime == flight.DepartureTime &&
-                f.ArrivalTime == flight.ArrivalTime); ;
+                f.ArrivalTime == flight.ArrivalTime); 
         }
 
         public static Flight? GetFlightById(int id)
