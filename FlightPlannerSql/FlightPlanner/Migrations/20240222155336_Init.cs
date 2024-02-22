@@ -23,6 +23,10 @@ namespace FlightPlanner.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Airports", x => x.Id);
+                    table.UniqueConstraint("AK_Airports_Country_City_AirportCode", x => 
+                        new { x.Country, x.City, x.AirportCode });
+
+
                 });
 
             migrationBuilder.CreateTable(
@@ -40,6 +44,8 @@ namespace FlightPlanner.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Flights", x => x.Id);
+                    table.UniqueConstraint("AK_Flights_FromId_ToId_Carrier_DepartureTime_ArrivalTime", x => 
+                        new { x.Carrier, x.DepartureTime, x.ArrivalTime });
                     table.ForeignKey(
                         name: "FK_Flights_Airports_FromId",
                         column: x => x.FromId,
@@ -52,6 +58,7 @@ namespace FlightPlanner.Migrations
                         principalTable: "Airports",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.NoAction);
+                        
                 });
 
             migrationBuilder.CreateIndex(

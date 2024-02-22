@@ -40,13 +40,45 @@ namespace FlightPlanner.Controllers
         [Route("flights/{id}")]
         public IActionResult DeleteFlight(int id)
         {
-            FlightStorage.DeleteFlightById(id);
+            var flightToRemove = _context.Flights.Include(flight => flight.To)
+                .Include(flight => flight.From)
+                .SingleOrDefault(flight => flight.Id == id);
+            if (flightToRemove != null)
+            {
+                _context.Flights.Remove(flightToRemove);
+            }
+
+            _context.SaveChanges();
 
             return Ok();
         }
         [HttpPut]
         [Route("flights")]
         public IActionResult AddFlight(Flight flight)
+        {
+
+
+            IActionResult validationError = ValidateFlight(flight);
+            if (validationError != null)
+            {
+                return validationError;
+            }
+
+            try
+            {
+                // Add the flight to the context and save changes
+                _context.Flights.Add(flight);
+                _context.SaveChanges();
+                return Created("", flight);
+            }
+            catch (Exception ex)
+            {
+                // Handle any exceptions
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        private IActionResult ValidateFlight(Flight flight)
         {
             if (flight == null)
             {
@@ -89,20 +121,21 @@ namespace FlightPlanner.Controllers
                 return BadRequest();
             }
 
-            _context.Flights.Add(flight);
-            _context.SaveChanges();
-            return Created("", flight);
+            return null;
         }
-        public bool SqlFlightExists(Flight flight)
+        private bool SqlFlightExists(Flight flight)
         {
-            return _context.Flights.Include(f => f.To).Include(f => f.From).Any(f =>
+            return _context.Flights
+                .Include(f => f.To)
+                .Include(f => f.From)
+                .Any(f =>
                 f.Carrier == flight.Carrier &&
                 f.From.AirportCode == flight.From.AirportCode &&
                 f.To.AirportCode == flight.To.AirportCode &&
                 f.DepartureTime == flight.DepartureTime &&
                 f.ArrivalTime == flight.ArrivalTime);
-            
         }
+        
 
 
 
