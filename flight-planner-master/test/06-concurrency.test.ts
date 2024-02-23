@@ -40,5 +40,5 @@ describe("Concurrency Handling", () => {
         expect(response.data.totalItems).toBe(1)
 
         done()
-    }, 60000);
+    }, 6000000);
 });

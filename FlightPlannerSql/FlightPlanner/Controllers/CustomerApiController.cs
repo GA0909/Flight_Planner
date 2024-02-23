@@ -1,9 +1,6 @@
-﻿using System.Globalization;
-using FlightPlanner.models;
-using FlightPlanner.storage;
+﻿using FlightPlanner.models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-
 
 namespace FlightPlanner.Controllers
 {
@@ -73,8 +70,6 @@ namespace FlightPlanner.Controllers
             }
             return Ok(flight);
         }
-
-
 
     }
 }

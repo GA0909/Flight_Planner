@@ -1,11 +1,8 @@
-﻿using System.ComponentModel.Design.Serialization;
-using System.Globalization;
-using FlightPlanner.models;
-using FlightPlanner.storage;
+﻿using FlightPlanner.models;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 
 namespace FlightPlanner.Controllers
 {
@@ -15,6 +12,7 @@ namespace FlightPlanner.Controllers
     public class AdminCntrl : ControllerBase
     {
         private readonly FlightPlannerDbContex _context;
+        private static readonly object _lockObject = new object();
 
         public AdminCntrl(FlightPlannerDbContex context)
         {
@@ -46,9 +44,12 @@ namespace FlightPlanner.Controllers
             if (flightToRemove != null)
             {
                 _context.Flights.Remove(flightToRemove);
+                _context.Airports.Remove(flightToRemove.From);
+                _context.Airports.Remove(flightToRemove.To);
             }
 
             _context.SaveChanges();
+
 
             return Ok();
         }
@@ -56,93 +57,65 @@ namespace FlightPlanner.Controllers
         [Route("flights")]
         public IActionResult AddFlight(Flight flight)
         {
-
-
-            IActionResult validationError = ValidateFlight(flight);
-            if (validationError != null)
+            lock (_lockObject)
             {
-                return validationError;
-            }
+                if (flight == null ||
+                    string.IsNullOrEmpty(flight.Carrier) ||
+                    string.IsNullOrEmpty(flight.From.AirportCode) ||
+                    string.IsNullOrEmpty(flight.From.Country) ||
+                    string.IsNullOrEmpty(flight.From.City) ||
+                    string.IsNullOrEmpty(flight.To.AirportCode) ||
+                    string.IsNullOrEmpty(flight.To.Country) ||
+                    string.IsNullOrEmpty(flight.To.City))
+                {
+                    return BadRequest();
+                }
 
-            try
-            {
-                // Add the flight to the context and save changes
+                string fromAirportCode = flight.From.AirportCode.Trim().ToLower();
+                string toAirportCode = flight.To.AirportCode.Trim().ToLower();
+
+                if (fromAirportCode == toAirportCode)
+                {
+                    return BadRequest();
+                }
+
+                if (!DateTime.TryParseExact(flight.DepartureTime, "yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime departureDateTime) ||
+                    !DateTime.TryParseExact(flight.ArrivalTime, "yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime arrivalDateTime))
+                {
+                    return BadRequest();
+                }
+
+                if (departureDateTime >= arrivalDateTime)
+                {
+                    return BadRequest();
+                }
+
+                if (SqlFlightExists(flight))
+                {
+                    return Conflict();
+
+                }
+
                 _context.Flights.Add(flight);
                 _context.SaveChanges();
+
                 return Created("", flight);
+
             }
-            catch (Exception ex)
-            {
-                // Handle any exceptions
-                return StatusCode(500, ex.Message);
-            }
+
         }
 
-        private IActionResult ValidateFlight(Flight flight)
-        {
-            if (flight == null)
-            {
-                return BadRequest();
-            }
-
-            if (string.IsNullOrEmpty(flight.Carrier) ||
-                string.IsNullOrEmpty(flight.From.AirportCode) ||
-                string.IsNullOrEmpty(flight.From.Country) ||
-                string.IsNullOrEmpty(flight.From.City) ||
-                string.IsNullOrEmpty(flight.To.AirportCode) ||
-                string.IsNullOrEmpty(flight.To.Country) ||
-                string.IsNullOrEmpty(flight.To.City))
-            {
-                return BadRequest();
-            }
-
-            if (SqlFlightExists(flight))
-            {
-                return Conflict();
-            }
-
-            string fromAirportCode = flight.From.AirportCode.Trim().ToLower();
-            string toAirportCode = flight.To.AirportCode.Trim().ToLower();
-
-
-            if (fromAirportCode == toAirportCode)
-            {
-                return BadRequest();
-            }
-
-            if (!DateTime.TryParseExact(flight.DepartureTime, "yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime departureDateTime) ||
-                !DateTime.TryParseExact(flight.ArrivalTime, "yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime arrivalDateTime))
-            {
-                return BadRequest();
-            }
-
-            if (departureDateTime >= arrivalDateTime)
-            {
-                return BadRequest();
-            }
-
-            return null;
-        }
-        private bool SqlFlightExists(Flight flight)
+        public bool SqlFlightExists(Flight flight)
         {
             return _context.Flights
-                .Include(f => f.To)
                 .Include(f => f.From)
-                .Any(f =>
-                f.Carrier == flight.Carrier &&
-                f.From.AirportCode == flight.From.AirportCode &&
-                f.To.AirportCode == flight.To.AirportCode &&
-                f.DepartureTime == flight.DepartureTime &&
-                f.ArrivalTime == flight.ArrivalTime);
+                .Include(f => f.To)
+                .Any(f => f.From.AirportCode == flight.From.AirportCode &&
+                          f.To.AirportCode == flight.To.AirportCode &&
+                          f.DepartureTime == flight.DepartureTime &&
+                          f.ArrivalTime == flight.ArrivalTime);
+
         }
-        
-
-
-
     }
-
-    
-
-
 
 }
