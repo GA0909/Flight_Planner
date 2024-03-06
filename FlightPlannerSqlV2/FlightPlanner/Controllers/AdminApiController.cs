@@ -1,4 +1,5 @@
-﻿using FlightPlanner.Core.Services;
+﻿using AutoMapper;
+using FlightPlanner.Core.Services;
 using FlightPlanner.models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,11 +14,13 @@ namespace FlightPlanner.Controllers
     public class AdminCntrl : ControllerBase
     {
         private readonly IFlightService _flightService;
+        private readonly IMapper _mapper;
         private static readonly object _lockObject = new object();
 
-        public AdminCntrl(IFlightService flightService)
+        public AdminCntrl(IFlightService flightService, IMapper mapper)
         {
             _flightService = flightService;
+            _mapper = mapper;
         }
 
         [HttpGet]
@@ -30,24 +33,20 @@ namespace FlightPlanner.Controllers
                 return NotFound();
             }
 
-            return Ok(flight);
+            return Ok(_mapper.Map<AddFlightResponse>(flight));
         }
 
         [HttpDelete]
         [Route("flights/{id}")]
         public IActionResult DeleteFlight(int id)
         {
-            var flightToRemove = _context.Flights.Include(flight => flight.To)
-                .Include(flight => flight.From)
-                .SingleOrDefault(flight => flight.Id == id);
+            var flightToRemove = _flightService.GetFullFlighById(id);
             if (flightToRemove != null)
             {
-                _context.Flights.Remove(flightToRemove);
-                _context.Airports.Remove(flightToRemove.From);
-                _context.Airports.Remove(flightToRemove.To);
+                _flightService.Delete(flightToRemove);
             }
 
-            _context.SaveChanges();
+            
 
 
             return Ok();
@@ -89,31 +88,21 @@ namespace FlightPlanner.Controllers
                     return BadRequest();
                 }
 
-                if (SqlFlightExists(flight))
+                if (_flightService.FlightExists(_mapper.Map<Flight>(flight)))
                 {
                     return Conflict();
 
                 }
+                var fflight = _mapper.Map<Flight>(flight);
+                _flightService.Create(fflight);
 
-                _flightService.Create(flight);
-
-                return Created("", flight);
+                return Created("",_mapper.Map<AddFlightResponse>(fflight));
 
             }
 
         }
 
-        public bool SqlFlightExists(Flight flight)
-        {
-            return _context.Flights
-                .Include(f => f.From)
-                .Include(f => f.To)
-                .Any(f => f.From.AirportCode == flight.From.AirportCode &&
-                          f.To.AirportCode == flight.To.AirportCode &&
-                          f.DepartureTime == flight.DepartureTime &&
-                          f.ArrivalTime == flight.ArrivalTime);
-
-        }
+        
     }
 
 }

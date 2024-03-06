@@ -21,5 +21,17 @@ namespace FlightPlanner.Service
             return _context.Flights.Include(f => f.From).Include(f => f.To)
                 .SingleOrDefault(f => f.Id == id);
         }
+
+        public bool FlightExists(Flight flight)
+        {
+            return _context.Flights
+                .Include(f => f.From)
+                .Include(f => f.To)
+                .Any(f => f.From.AirportCode == flight.From.AirportCode &&
+                          f.To.AirportCode == flight.To.AirportCode &&
+                          f.DepartureTime == flight.DepartureTime &&
+                          f.ArrivalTime == flight.ArrivalTime);
+        }
+
     }
 }

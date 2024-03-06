@@ -1,4 +1,5 @@
-﻿using FlightPlanner.models;
+﻿using AutoMapper;
+using FlightPlanner.models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,10 +10,12 @@ namespace FlightPlanner.Controllers
     public class CustomerClient : ControllerBase
     {
         private readonly FlightPlannerDbContext _context;
+        private readonly IMapper _mapper;
 
-        public CustomerClient(FlightPlannerDbContext context)
+        public CustomerClient(FlightPlannerDbContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
         [HttpGet]
         [Route("airports")]
@@ -24,8 +27,26 @@ namespace FlightPlanner.Controllers
                 .Where(f => f.Country.ToLower().Contains(normalizedPhrase) ||
                             f.City.ToLower().Contains(normalizedPhrase) ||
                             f.AirportCode.ToLower().Contains(normalizedPhrase)).ToList();
-                
-            return Ok(matchedAirports);
+
+            // Create a list to store AirportViewModel objects
+            List<AirportViewModel> airportViewModels = new List<AirportViewModel>();
+
+            // Iterate over matchedAirports and create AirportViewModel objects
+            foreach (var airport in matchedAirports)
+            {
+                AirportViewModel viewModel = new AirportViewModel
+                {
+                    Country = airport.Country,
+                    City = airport.City,
+                    Airport = airport.AirportCode // Assuming AirportCode should go to Airport property in AirportViewModel
+                };
+
+                // Add the created AirportViewModel to the list
+                airportViewModels.Add(viewModel);
+            }
+
+            // Return the list of AirportViewModel objects
+            return Ok(airportViewModels);
         }
 
         [HttpPost]
@@ -68,7 +89,7 @@ namespace FlightPlanner.Controllers
             {
                 return NotFound();
             }
-            return Ok(flight);
+            return Ok(_mapper.Map<AddFlightResponse>(flight));
         }
 
     }

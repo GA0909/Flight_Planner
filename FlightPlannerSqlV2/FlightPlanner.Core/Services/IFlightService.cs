@@ -10,5 +10,6 @@ namespace FlightPlanner.Core.Services
     public interface IFlightService : IEntityService<Flight>
     {
         Flight? GetFullFlighById(int id);
+        bool FlightExists(Flight flight);
     }
 }
