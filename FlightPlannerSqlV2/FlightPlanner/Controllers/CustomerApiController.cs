@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using FlightPlanner.Core.Services;
 using FlightPlanner.models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -9,36 +10,31 @@ namespace FlightPlanner.Controllers
     [ApiController]
     public class CustomerClient : ControllerBase
     {
-        private readonly FlightPlannerDbContext _context;
+        private readonly IFlightService _flightService;
         private readonly IMapper _mapper;
 
-        public CustomerClient(FlightPlannerDbContext context, IMapper mapper)
+        public CustomerClient(IFlightService flightService, IMapper mapper)
         {
-            _context = context;
+            _flightService = flightService;
             _mapper = mapper;
         }
         [HttpGet]
         [Route("airports")]
         public IActionResult SearchAirports(string search)
         {
-            string normalizedPhrase = search.ToLower().Replace(" ", "");
-
-            var matchedAirports = _context.Airports
-                .Where(f => f.Country.ToLower().Contains(normalizedPhrase) ||
-                            f.City.ToLower().Contains(normalizedPhrase) ||
-                            f.AirportCode.ToLower().Contains(normalizedPhrase)).ToList();
+            var matchedAirport = _flightService.AirportSearch(search);
 
             // Create a list to store AirportViewModel objects
             List<AirportViewModel> airportViewModels = new List<AirportViewModel>();
 
-            // Iterate over matchedAirports and create AirportViewModel objects
-            foreach (var airport in matchedAirports)
+            if (matchedAirport != null)
             {
+                // Create AirportViewModel object for the matched airport
                 AirportViewModel viewModel = new AirportViewModel
                 {
-                    Country = airport.Country,
-                    City = airport.City,
-                    Airport = airport.AirportCode // Assuming AirportCode should go to Airport property in AirportViewModel
+                    Country = matchedAirport.Country,
+                    City = matchedAirport.City,
+                    Airport = matchedAirport.AirportCode // Assuming AirportCode should go to Airport property in AirportViewModel
                 };
 
                 // Add the created AirportViewModel to the list
@@ -59,22 +55,17 @@ namespace FlightPlanner.Controllers
                 return BadRequest();
             }
 
-            var matchedFlights = _context.Flights
-                .Include(f => f.From)
-                .Include(f => f.To)
-                .Where(f =>
-                    f.From.AirportCode == req.From &&
-                    f.To.AirportCode == req.To &&
-                    f.DepartureTime.Substring(0,10) == req.DepartureDate)
-                .ToList();
+            var matchedFlights = _flightService.GetMatchedFlights(req);
 
+            // Create a PageResult object
             PageResult result = new PageResult
             {
-                Page = 0, 
+                Page = 0,
                 TotalItems = matchedFlights.Count,
                 Items = matchedFlights
             };
 
+            // Return the PageResult
             return Ok(result);
 
         }
@@ -82,9 +73,7 @@ namespace FlightPlanner.Controllers
         [Route("flights/{id}")]
         public IActionResult FindFlightById(int id)
         {
-            var flight = _context.Flights.Include(flight => flight.To)
-                .Include(flight => flight.From)
-                .SingleOrDefault(flight => flight.Id == id);
+            var flight = _flightService.GetFullFlighById(id);
             if (flight == null)
             {
                 return NotFound();
