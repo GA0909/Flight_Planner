@@ -16,6 +16,7 @@ namespace FlightPlanner.Service
         public FlightService(IFlightPlannerDbContext context): base(context) 
         {
         }
+
         public Flight? GetFullFlighById(int id)
         {
             return _context.Flights.Include(f => f.From).Include(f => f.To)
@@ -31,7 +32,9 @@ namespace FlightPlanner.Service
                           f.To.AirportCode == flight.To.AirportCode &&
                           f.DepartureTime == flight.DepartureTime &&
                           f.ArrivalTime == flight.ArrivalTime);
+        
         }
+
         public Airport? AirportSearch(string phrase)
         {
             string normalizedPhrase = phrase.ToLower().Replace(" ", "");
@@ -39,8 +42,10 @@ namespace FlightPlanner.Service
                 .FirstOrDefault(f => f.Country.ToLower().Contains(normalizedPhrase) ||
                                       f.City.ToLower().Contains(normalizedPhrase) ||
                                       f.AirportCode.ToLower().Contains(normalizedPhrase));
+        
         }
-        public List<Flight> GetMatchedFlights(SearchFlightsRequest req)
+
+        public PageResult GetMatchedFlights(SearchFlightsRequest req)
         {
             // Perform the LINQ query to retrieve matched flights
             var matchedFlights = _context.Flights
@@ -52,7 +57,15 @@ namespace FlightPlanner.Service
                     f.DepartureTime.Substring(0, 10) == req.DepartureDate)
                 .ToList();
 
-            return matchedFlights;
+            PageResult result = new PageResult
+            {
+                Page = 0,
+                TotalItems = matchedFlights.Count,
+                Items = matchedFlights
+            };
+
+            return result;
+
         }
 
     }

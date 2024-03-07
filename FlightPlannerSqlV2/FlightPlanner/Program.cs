@@ -4,6 +4,7 @@ using FlightPlanner.Data;
 using FlightPlanner.HANDLES;
 using FlightPlanner.models;
 using FlightPlanner.Service;
+using FluentValidation;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
@@ -37,6 +38,8 @@ namespace FlightPlanner
             builder.Services.AddTransient<IFlightService, FlightService>();
 
             builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
+
+            builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.

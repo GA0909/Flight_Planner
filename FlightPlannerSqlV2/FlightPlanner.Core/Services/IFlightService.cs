@@ -12,7 +12,7 @@ namespace FlightPlanner.Core.Services
         Flight? GetFullFlighById(int id);
         bool FlightExists(Flight flight);
         Airport? AirportSearch(string phrase);
-        List<Flight> GetMatchedFlights(SearchFlightsRequest req);
-        
+        PageResult GetMatchedFlights(SearchFlightsRequest req);
+
     }
 }
