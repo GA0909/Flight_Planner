@@ -25,13 +25,17 @@ namespace FlightPlanner.Controllers
         [Route("airports")]
         public IActionResult SearchAirports(string search)
         {
-            var matchedAirport = _flightService.AirportSearch(search);
+            var matchedAirports = _flightService.AirportSearch(search);
 
             List<AirportViewModel> airports = new List<AirportViewModel>();
 
-            if(matchedAirport != null) 
+            if(matchedAirports != null) 
             {
-                airports.Add(_mapper.Map<AirportViewModel>(matchedAirport));
+                foreach(var airport in matchedAirports)
+                {
+                    airports.Add(_mapper.Map<AirportViewModel>(airport));
+                }
+               
             }
            
             return Ok(airports);

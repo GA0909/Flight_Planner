@@ -16,6 +16,5 @@ namespace FlightPlanner.Data
         DbSet<Airport> Airports { get; set; }
         DbSet<Flight> Flights { get; set; }
         int SaveChanges();
-
     }
 }

@@ -45,5 +45,11 @@ namespace FlightPlanner.Service
             _context.Entry(entity).State = EntityState.Modified;
             _context.SaveChanges();
         }
+        public void RemoveAllFlightsAndAirports()
+        {
+            _context.Flights.RemoveRange(_context.Flights);
+            _context.Airports.RemoveRange(_context.Airports);
+            _context.SaveChanges();
+        }
     }
 }
