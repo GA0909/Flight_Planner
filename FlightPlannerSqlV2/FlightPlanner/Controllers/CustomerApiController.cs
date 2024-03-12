@@ -13,19 +13,21 @@ namespace FlightPlanner.Controllers
         private readonly IFlightService _flightService;
         private readonly IMapper _mapper;
         private readonly IValidator<SearchFlightsRequest> _validator;
+        private readonly IAirportService _airportService;
 
-        public CustomerClient(IFlightService flightService, IMapper mapper,IValidator<SearchFlightsRequest> validator)
+        public CustomerClient(IFlightService flightService, IMapper mapper,IValidator<SearchFlightsRequest> validator, IAirportService airportService)
         {
             _flightService = flightService;
             _mapper = mapper;
             _validator = validator;
+            _airportService = airportService;
         }
 
         [HttpGet]
         [Route("airports")]
         public IActionResult SearchAirports(string search)
         {
-            var matchedAirports = _flightService.AirportSearch(search);
+            var matchedAirports = _airportService.AirportSearch(search);
 
             List<AirportViewModel> airports = new List<AirportViewModel>();
 
