@@ -1,7 +1,10 @@
-﻿using AutoMapper;
-using FlightPlanner.Core.Services;
-using FlightPlanner.models;
-using FluentValidation;
+﻿
+using FlightPlanner.Extensions;
+using FlightPlanner.UseCases.Flights.AddFlight;
+using FlightPlanner.UseCases.Flights.DeleteFlight;
+using FlightPlanner.UseCases.Flights.GetFlight;
+using FlightPlanner.UseCases.models;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,71 +16,32 @@ namespace FlightPlanner.Controllers
     [ApiController]
     public class AdminCntrl : ControllerBase
     {
-        private readonly IFlightService _flightService;
-        private readonly IMapper _mapper;
-        private readonly IValidator<AddFlightRequest> _validator;
-        private static readonly object _lockObject = new object();
+        private readonly IMediator _mediator;
 
-        public AdminCntrl(IFlightService flightService, IMapper mapper,IValidator<AddFlightRequest> validator)
+        public AdminCntrl( IMediator mediator)
         {
-            _flightService = flightService;
-            _mapper = mapper;
-            _validator = validator;
+            _mediator = mediator;
         }
 
         [HttpGet]
         [Route("flights/{id}")]
-        public IActionResult GetFlight(int id)
+        public async Task<IActionResult> GetFlight(int id)
         {
-            var flight = _flightService.GetFullFlighById(id);
-
-            if (flight == null)
-            {
-                return NotFound();
-            }
-
-            return Ok(_mapper.Map<AddFlightResponse>(flight));
+            return (await _mediator.Send(new GetFlightQuery(id))).ToActionResult();
         }
 
         [HttpDelete]
         [Route("flights/{id}")]
-        public IActionResult DeleteFlight(int id)
+        public async Task<IActionResult> DeleteFlight(int id)
         {
-            var flightToRemove = _flightService.GetFullFlighById(id);
-
-            if (flightToRemove != null)
-            {
-                _flightService.Delete(flightToRemove);
-            }
-
-            return Ok();
+            return (await _mediator.Send(new DeleteFlightQuery(id))).ToActionResult();
         }
 
         [HttpPut]
         [Route("flights")]
-        public IActionResult AddFlight(AddFlightRequest flight)
+        public async Task<IActionResult> AddFlight(AddFlightRequest request)
         {
-            lock (_lockObject)
-            {
-                var validationResult = _validator.Validate(flight);
-
-                if (!validationResult.IsValid)
-                {
-                    return BadRequest();
-                }
-
-                if (_flightService.FlightExists(_mapper.Map<Flight>(flight)))
-                {
-                    return Conflict();
-                }
-
-                var fflight = _mapper.Map<Flight>(flight);
-                _flightService.Create(fflight);
-
-                return Created("",_mapper.Map<AddFlightResponse>(fflight));
-
-            }
-
+            return (await _mediator.Send(new AddFlightCommand { AddFlightRequest = request })).ToActionResult();
         }
 
     }

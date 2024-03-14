@@ -1,17 +1,17 @@
 ﻿using FlightPlanner.models;
 using FluentValidation;
 
-namespace FlightPlanner.Validations
+namespace FlightPlanner.UseCases.Validations
 {
     public class SearchFlightRequestValidator : AbstractValidator<SearchFlightsRequest>
     {
-        public SearchFlightRequestValidator() 
+        public SearchFlightRequestValidator()
         {
             RuleFor(request => request.DepartureDate).NotEmpty();
             RuleFor(request => request.From).NotEmpty();
             RuleFor(request => request.To).NotEmpty();
             RuleFor(request => request)
-                .Must(request => 
+                .Must(request =>
                 AreDifferentAirports(request.From, request.To));
 
         }

@@ -1,21 +1,22 @@
 ﻿using AutoMapper;
 using FlightPlanner.models;
+using FlightPlanner.UseCases.models;
 
-namespace FlightPlanner.Mapping
+namespace FlightPlanner.UseCases.Mapping
 {
     public class MappingProfile : Profile
     {
-        public MappingProfile() 
+        public MappingProfile()
         {
             CreateMap<AddFlightRequest, Flight>();
 
-            CreateMap<Airport,AirportViewModel>()
-                .ForMember(viewModel => viewModel.Airport, options => 
+            CreateMap<Airport, AirportViewModel>()
+                .ForMember(viewModel => viewModel.Airport, options =>
                 options.MapFrom(source => source.AirportCode));
             CreateMap<AirportViewModel, Airport>()
                 .ForMember(destination => destination.AirportCode, options =>
                 options.MapFrom(source => source.Airport));
             CreateMap<Flight, AddFlightResponse>();
-        } 
+        }
     }
 }

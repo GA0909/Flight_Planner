@@ -1,5 +1,6 @@
 
 using FlightPlanner.Core.Services;
+using FlightPlanner.UseCases;
 using FlightPlanner.Data;
 using FlightPlanner.HANDLES;
 using FlightPlanner.models;
@@ -40,6 +41,10 @@ namespace FlightPlanner
             builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
             builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
+
+            builder.Services.AddServices();
+
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.

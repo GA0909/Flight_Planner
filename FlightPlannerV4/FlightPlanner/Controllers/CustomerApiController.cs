@@ -1,7 +1,11 @@
 ﻿using AutoMapper;
 using FlightPlanner.Core.Services;
+using FlightPlanner.Extensions;
 using FlightPlanner.models;
+using FlightPlanner.UseCases.Flights.GetFlight;
+using FlightPlanner.UseCases.models;
 using FluentValidation;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FlightPlanner.Controllers
@@ -14,9 +18,11 @@ namespace FlightPlanner.Controllers
         private readonly IMapper _mapper;
         private readonly IValidator<SearchFlightsRequest> _validator;
         private readonly IAirportService _airportService;
+        private readonly IMediator _mediator;
 
-        public CustomerClient(IFlightService flightService, IMapper mapper,IValidator<SearchFlightsRequest> validator, IAirportService airportService)
+        public CustomerClient(IMediator mediator ,IFlightService flightService, IMapper mapper,IValidator<SearchFlightsRequest> validator, IAirportService airportService)
         {
+            _mediator = mediator;
             _flightService = flightService;
             _mapper = mapper;
             _validator = validator;
@@ -63,17 +69,9 @@ namespace FlightPlanner.Controllers
 
         [HttpGet]
         [Route("flights/{id}")]
-        public IActionResult FindFlightById(int id)
+        public async Task<IActionResult> GetFlight(int id)
         {
-            var flight = _flightService.GetFullFlighById(id);
-
-            if (flight == null)
-            {
-                return NotFound();
-            }
-
-            return Ok(_mapper.Map<AddFlightResponse>(flight));
-
+            return (await _mediator.Send(new GetFlightQuery(id))).ToActionResult();
         }
 
     }

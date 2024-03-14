@@ -1,4 +1,4 @@
-﻿namespace FlightPlanner.models
+﻿namespace FlightPlanner.UseCases.models
 {
     public class AddFlightResponse
     {

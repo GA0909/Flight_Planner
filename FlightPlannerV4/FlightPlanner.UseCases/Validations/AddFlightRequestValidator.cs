@@ -1,8 +1,8 @@
-﻿using FlightPlanner.models;
+﻿using FlightPlanner.UseCases.models;
 using FluentValidation;
 using System.Globalization;
 
-namespace FlightPlanner.Validations
+namespace FlightPlanner.UseCases.Validations
 {
     public class AddFlightRequestValidator : AbstractValidator<AddFlightRequest>
     {
@@ -16,16 +16,16 @@ namespace FlightPlanner.Validations
 
             // Custom validation for airport codes
             RuleFor(request => request)
-                .Must(request => 
+                .Must(request =>
                 AreDifferentAirports(request.From.Airport, request.To.Airport));
 
             // Custom validation for date and time
             RuleFor(request => request)
-                .Must(request => 
+                .Must(request =>
                 AreValidDateTime(request.DepartureTime, request.ArrivalTime));
 
             RuleFor(request => request)
-                .Must(request => 
+                .Must(request =>
                 IsDepartureBeforeArrival(request.DepartureTime, request.ArrivalTime));
         }
 

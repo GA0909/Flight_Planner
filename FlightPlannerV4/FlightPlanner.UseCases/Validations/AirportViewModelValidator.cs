@@ -1,11 +1,12 @@
 ﻿using FlightPlanner.models;
+using FlightPlanner.UseCases.models;
 using FluentValidation;
 
-namespace FlightPlanner.Validations
+namespace FlightPlanner.UseCases.Validations
 {
     public class AirportViewModelValidator : AbstractValidator<AirportViewModel>
     {
-        public AirportViewModelValidator() 
+        public AirportViewModelValidator()
         {
             RuleFor(viewModel => viewModel.Airport).NotEmpty();
             RuleFor(viewModel => viewModel.City).NotEmpty();
