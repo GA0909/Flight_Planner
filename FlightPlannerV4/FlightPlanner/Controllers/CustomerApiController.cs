@@ -2,7 +2,9 @@
 using FlightPlanner.Core.Services;
 using FlightPlanner.Extensions;
 using FlightPlanner.models;
+using FlightPlanner.UseCases.Airports.SearchAirports;
 using FlightPlanner.UseCases.Flights.GetFlight;
+using FlightPlanner.UseCases.Flights.SearchFlights;
 using FlightPlanner.UseCases.models;
 using FluentValidation;
 using MediatR;
@@ -14,57 +16,25 @@ namespace FlightPlanner.Controllers
     [ApiController]
     public class CustomerClient : ControllerBase
     {
-        private readonly IFlightService _flightService;
-        private readonly IMapper _mapper;
-        private readonly IValidator<SearchFlightsRequest> _validator;
-        private readonly IAirportService _airportService;
         private readonly IMediator _mediator;
 
-        public CustomerClient(IMediator mediator ,IFlightService flightService, IMapper mapper,IValidator<SearchFlightsRequest> validator, IAirportService airportService)
+        public CustomerClient(IMediator mediator)
         {
             _mediator = mediator;
-            _flightService = flightService;
-            _mapper = mapper;
-            _validator = validator;
-            _airportService = airportService;
         }
 
         [HttpGet]
         [Route("airports")]
-        public IActionResult SearchAirports(string search)
+        public async Task<IActionResult> SearchAirports(string search)
         {
-            var matchedAirports = _airportService.AirportSearch(search);
-
-            List<AirportViewModel> airports = new List<AirportViewModel>();
-
-            if(matchedAirports != null) 
-            {
-                foreach(var airport in matchedAirports)
-                {
-                    airports.Add(_mapper.Map<AirportViewModel>(airport));
-                }
-               
-            }
-           
-            return Ok(airports);
-
+            return (await _mediator.Send(new SearchAirportQuery(search))).ToActionResult();
         }
 
         [HttpPost]
         [Route("flights/search")]
-        public IActionResult SearchFlights(SearchFlightsRequest req)
+        public async Task<IActionResult> SearchFlights(SearchFlightsRequest req)
         {
-            var validationResult = _validator.Validate(req);
-
-            if (!validationResult.IsValid)
-            {
-                return BadRequest();
-            }
-
-            var result = _flightService.GetMatchedFlights(req);
-
-            return Ok(result);
-
+            return (await _mediator.Send(new SearchFlightQuery(req))).ToActionResult();
         }
 
         [HttpGet]

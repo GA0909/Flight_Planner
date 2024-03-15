@@ -10,17 +10,17 @@ using System.Threading.Tasks;
 
 namespace FlightPlanner.UseCases.Flights.DeleteFlight
 {
-    public class DeleteFlightQueryHandler : IRequestHandler<DeleteFlightQuery, ServiceResults>
+    public class DeleteFlightCommandHandler : IRequestHandler<DeleteFlightCommand, ServiceResults>
     {
         private readonly IFlightService _flightService;
         private readonly IMapper _mapper;
 
-        public DeleteFlightQueryHandler(IFlightService flightService, IMapper mapper)
+        public DeleteFlightCommandHandler(IFlightService flightService, IMapper mapper)
         {
             _flightService = flightService;
             _mapper = mapper;
         }
-        public async Task<ServiceResults> Handle(DeleteFlightQuery request, CancellationToken cancellationToken)
+        public async Task<ServiceResults> Handle(DeleteFlightCommand request, CancellationToken cancellationToken)
         {
             var flightToRemove = _flightService.GetFullFlighById(request.Id);
 

@@ -18,9 +18,4 @@
     <ProjectReference Include="..\FlightPlanner.Core\FlightPlanner.Core.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Airports\SearchAirports\" />
-    <Folder Include="Flights\SearchFlights\" />
-  </ItemGroup>
-
 </Project>

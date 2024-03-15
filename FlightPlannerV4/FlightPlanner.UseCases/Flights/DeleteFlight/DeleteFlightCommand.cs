@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 namespace FlightPlanner.UseCases.Flights.DeleteFlight
 
 {
-    public class DeleteFlightQuery : IRequest<ServiceResults>
+    public class DeleteFlightCommand : IRequest<ServiceResults>
     {
-        public DeleteFlightQuery(int id) 
+        public DeleteFlightCommand(int id) 
         {
             Id = id;
         }

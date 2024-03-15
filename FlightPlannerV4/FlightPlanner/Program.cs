@@ -37,6 +37,7 @@ namespace FlightPlanner
             builder.Services.AddTransient<IEntityService<Flight>, EntityService<Flight>>();
 
             builder.Services.AddTransient<IFlightService, FlightService>();
+            builder.Services.AddTransient<IAirportService, AirportService>();
 
             builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 

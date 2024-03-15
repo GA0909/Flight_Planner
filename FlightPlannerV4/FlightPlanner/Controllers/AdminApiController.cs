@@ -17,6 +17,7 @@ namespace FlightPlanner.Controllers
     public class AdminCntrl : ControllerBase
     {
         private readonly IMediator _mediator;
+        private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
 
         public AdminCntrl( IMediator mediator)
         {
@@ -34,7 +35,7 @@ namespace FlightPlanner.Controllers
         [Route("flights/{id}")]
         public async Task<IActionResult> DeleteFlight(int id)
         {
-            return (await _mediator.Send(new DeleteFlightQuery(id))).ToActionResult();
+            return (await _mediator.Send(new DeleteFlightCommand(id))).ToActionResult();
         }
 
         [HttpPut]

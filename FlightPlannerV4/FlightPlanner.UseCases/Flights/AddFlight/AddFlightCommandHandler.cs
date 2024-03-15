@@ -19,6 +19,7 @@ namespace FlightPlanner.UseCases.Flights.AddFlight
         private readonly IFlightService _flightService;
         private readonly IMapper _mapper;
         private readonly IValidator<AddFlightRequest> _validator;
+
         public AddFlightCommandHandler(IFlightService flightService, IMapper mapper, IValidator<AddFlightRequest> validator)
         {
             _flightService = flightService;
