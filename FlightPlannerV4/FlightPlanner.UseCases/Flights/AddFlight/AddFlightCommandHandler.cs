@@ -19,6 +19,7 @@ namespace FlightPlanner.UseCases.Flights.AddFlight
         private readonly IFlightService _flightService;
         private readonly IMapper _mapper;
         private readonly IValidator<AddFlightRequest> _validator;
+        private static readonly object _lockObject = new object();
 
         public AddFlightCommandHandler(IFlightService flightService, IMapper mapper, IValidator<AddFlightRequest> validator)
         {
@@ -40,27 +41,28 @@ namespace FlightPlanner.UseCases.Flights.AddFlight
                 };
 
             }
-
-            if (_flightService.FlightExists(_mapper.Map<Flight>(request.AddFlightRequest)))
+            lock (_lockObject)
             {
+                if (_flightService.FlightExists(_mapper.Map<Flight>(request.AddFlightRequest)))
+                {
+                    return new ServiceResults
+                    {
+                        ResultObject = request.AddFlightRequest,
+                        Status = HttpStatusCode.Conflict
+                    };
+
+                }
+
+                var flight = _mapper.Map<Flight>(request.AddFlightRequest);
+                _flightService.Create(flight);
+
                 return new ServiceResults
                 {
-                    ResultObject = request.AddFlightRequest,
-                    Status = HttpStatusCode.Conflict
+                    ResultObject = _mapper.Map<AddFlightResponse>(flight),
+                    Status = HttpStatusCode.Created
                 };
-                
+
             }
-
-            var flight = _mapper.Map<Flight>(request.AddFlightRequest);
-            _flightService.Create(flight);
-
-            return new ServiceResults
-            {
-                ResultObject = _mapper.Map<AddFlightResponse>(flight),
-                Status = HttpStatusCode.Created
-            };
-
-            
         }
     }
 }
