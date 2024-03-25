@@ -2,7 +2,7 @@
 using FlightPlanner.Core.Services;
 using FlightPlanner.Extensions;
 using FlightPlanner.models;
-using FlightPlanner.UseCases.Airports.SearchAirports;
+using FlightPlanner.UseCases.Airports.AirportSearch;
 using FlightPlanner.UseCases.Flights.GetFlight;
 using FlightPlanner.UseCases.Flights.SearchFlights;
 using FlightPlanner.UseCases.models;
@@ -27,7 +27,7 @@ namespace FlightPlanner.Controllers
         [Route("airports")]
         public async Task<IActionResult> SearchAirports(string search)
         {
-            return (await _mediator.Send(new SearchAirportQuery(search))).ToActionResult();
+            return (await _mediator.Send(new AirportSearchQuery(search))).ToActionResult();
         }
 
         [HttpPost]

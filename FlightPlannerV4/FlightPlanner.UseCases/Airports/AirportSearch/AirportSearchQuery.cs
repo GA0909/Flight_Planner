@@ -6,11 +6,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FlightPlanner.UseCases.Airports.SearchAirports
+namespace FlightPlanner.UseCases.Airports.AirportSearch
 {
-    public class SearchAirportQuery : IRequest<ServiceResults>
+    public class AirportSearchQuery : IRequest<ServiceResults>
     {
-        public SearchAirportQuery(string search) 
+        public AirportSearchQuery(string search) 
         {
             Search = search;
         }

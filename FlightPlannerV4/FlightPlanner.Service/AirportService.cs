@@ -14,7 +14,7 @@ namespace FlightPlanner.Service
         public AirportService(IFlightPlannerDbContext context) : base(context)
         {
         }
-        public List<Airport>? AirportSearch(string phrase)
+        public List<Airport>? SearchAirport(string phrase)
         {
             string normalizedPhrase = phrase.ToLower().Replace(" ", "");
             return _context.Airports

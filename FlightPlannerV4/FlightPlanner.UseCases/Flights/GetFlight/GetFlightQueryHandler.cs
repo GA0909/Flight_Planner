@@ -24,17 +24,16 @@ namespace FlightPlanner.UseCases.Flights.GetFlight
         {
             var flight = _flightService.GetFullFlighById(request.Id);
 
-            var response = new ServiceResults();
-
             if (flight == null)
             {
-                response.Status = HttpStatusCode.NotFound;
-                return response;
+                return new ServiceResults { Status = HttpStatusCode.NotFound};
             }
 
-            response.ResultObject = _mapper.Map<AddFlightResponse>(flight); 
-            response.Status = HttpStatusCode.OK;
-            return response;
+            return new ServiceResults 
+            {
+                ResultObject = _mapper.Map<AddFlightResponse>(flight),
+                Status = HttpStatusCode.OK
+            };
         }
     }
 }
